@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改图书</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layuimini/lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../layuimini/css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">ISBN</label>
+        <div class="layui-input-block">
+            <input type="text" name="isbn" lay-verify="required" lay-reqtext="ISBN不能为空" placeholder="请输入ISBN" class="layui-input" th:value="${book.isbn}" disabled="disabled">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">书名</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" lay-verify="required" lay-reqtext="书名不能为空" placeholder="请输入书名" class="layui-input" th:value="${book.title}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">作者</label>
+        <div class="layui-input-block">
+            <input type="text" name="author" lay-verify="required" lay-reqtext="作者不能为空" placeholder="请输入作者" class="layui-input" th:value="${book.author}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">出版时间</label>
+        <div class="layui-input-block">
+            <input type="text" name="yearOfPublication" lay-verify="required" lay-reqtext="出版时间不能为空" placeholder="请输入出版时间" class="layui-input" th:value="${book.yearOfPublication}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">出版商</label>
+        <div class="layui-input-block">
+            <input type="text" name="publisher" lay-verify="required" lay-reqtext="出版商不能为空" placeholder="请输入出版商" class="layui-input" th:value="${book.publisher}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">简介</label>
+        <div class="layui-input-block">
+            <textarea name="description" lay-verify="required" lay-reqtext="简介不能为空" class="layui-textarea" placeholder="请输入备注信息" th:value="${book.description}" th:utext="${book.description}"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">一级分类</label>
+        <div class="layui-input-block">
+            <select name="categorylevelone" lay-search lay-filter="categorylevelone" class="select">
+                <option value=''>-请选择一级分类-</option>
+                <option th:each="category:${categorylevelone}" th:value="${category.id}" th:text="${category.name}" th:selected="${book.categorylevelone eq category.id}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">二级分类</label>
+        <div class="layui-input-block">
+            <select name="categoryleveltwo" lay-search lay-filter="categoryleveltwo" class="select">
+                <option value=''>-请选择二级分类-</option>
+                <option th:each="category:${categoryleveltwo}" th:value="${category.id}" th:text="${category.name}" th:selected="${book.categoryleveltwo eq category.id}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">封面</label>
+        <div class="layui-input-inline">
+            <img class="layui-upload-img" id="image" name="image" width="50px" height="50px">
+            <input id="imageName" type="text" name="imageName" lay-verify="required" lay-reqtext="封面不能为空" autocomplete="off" class="layui-input" th:value="${book.image}" disabled>
+        </div>
+        <div class="layui-input-inline">
+            <button type="button" class="layui-btn" id="test1">
+                <i class="layui-icon">&#xe67c;</i>上传图片
+            </button>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script src="../../layuimini/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+
+    //封面图片上传
+    layui.use('upload', function (){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,accept: 'images'
+            ,acceptMime: 'image/*'
+            ,url: '../uploadBookImage' //改成您自己的上传接口
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#image').attr('src', result); //图片链接（base64）
+                });
+            },done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    layer.msg('上传失败');
+                }
+                //上传成功
+                layer.msg('上传成功');
+                //将图片的名字放在表单中，添加的时候得放在数据库里面
+                $(function(){
+                    $("#imageName").val(res.msg);
+                })
+            }
+        });
+    });
+
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+
+        //刷新第二分类名下拉列表数据
+        form.on('select(categorylevelone)', function (data){
+            var parentId = $("select[name=categorylevelone]").val();
+            $.ajax({
+                async: true,
+                type: "GET",
+                url: "../getCategoryByParentId/"+parentId,
+                success: function (data){
+                    var list = data;
+                    var html = "<option value=''>-请选择二级分类-</option>";
+                    for(var i = 0; i < list.length; i++){
+                        html += ("<option value='"+list[i].id+"'>"+list[i].name+"</option>");
+                    }
+                    $("select[name=categoryleveltwo]").empty();
+                    $("select[name=categoryleveltwo]").append(html);
+                    form.render('select');
+                }
+            });
+        });
+
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "../book/edit/"+data.field.isbn+"/"+data.field.title+"/"+data.field.author+"/"+data.field.yearOfPublication+"/"+data.field.publisher+"/"+data.field.description+"/"+data.field.categorylevelone+"/"+data.field.categoryleveltwo+"/"+data.field.imageName,
+                data: JSON.stringify(data.field),
+                dataType: "text",
+                ContentType: "application/json;charset=utf-8",
+                success: function (res){
+                    var index = layer.alert(res, {
+                        title: '最终的提交信息'
+                    }, function () {
+                        // 关闭弹出层
+                        layer.close(index);
+
+                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(iframeIndex);
+                    });
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

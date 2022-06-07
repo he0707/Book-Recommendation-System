@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>热门图书</title>
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container-fluid">
+    <table class="table table-striped table-hover">
+        <tr>
+            <th>ISBN</th>
+            <th>书名</th>
+            <th>作者</th>
+            <th>封面</th>
+            <th>评分总数</th>
+        </tr>
+        <tr th:each="popBook : ${popBooks}">
+            <td th:text="${popBook.getIsbn()}"></td>
+            <td th:text="${popBook.getTitle()}"></td>
+            <td th:text="${popBook.getAuthor()}"></td>
+            <td><img th:src="'/img/bookImage/'+${popBook.getImage()}" th:alt="${popBook.getImage()}" style="height: 40px;width: 30px"></td>
+            <td th:text="${popBook.getRatingNum()}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

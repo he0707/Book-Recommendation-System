@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>修改图书分类</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layuimini/lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../layuimini/css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">ID</label>
+        <div class="layui-input-block">
+            <input type="text" disabled="disabled" name="id" lay-verify="required" lay-reqtext="ID不能为空" class="layui-input" th:value="${category.id}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">分类名</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" lay-reqtext="用户名不能为空" class="layui-input" th:value="${category.name}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">父ID</label>
+        <div class="layui-input-block">
+            <input id="parentId" type="text" disabled="disabled" name="parentId" lay-verify="required" lay-reqtext="父ID不能为空" placeholder="请输入父ID" class="layui-input" th:value="${category.parentId}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">父分类名</label>
+        <div class="layui-input-block">
+            <select name="parentName" lay-search lay-filter="pName" class="select">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">分类级别</label>
+        <div class="layui-input-block">
+            <select name="categoryType" lay-filter="type" class="select">
+                <option value="1" th:selected="${category.type} eq 1">一</option>
+                <option value="2" th:selected="${category.type} eq 2">二</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script src="../../layuimini/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+        //刷新父分类名下拉列表数据
+        form.on('select(type)', function (data){
+            var type = $("select[name=categoryType]").val();
+            $.ajax({
+                async: true,
+                type: "GET",
+                url: "../getCategoryByType/"+type,
+                success: function (data){
+                    var list = data;
+                    var html = "<option value=''>-请选择父分类名-</option>>";
+                    for(var i = 0; i < list.length; i++){
+                        html += ("<option value='"+list[i].id+"'>"+list[i].name+"</option>");
+                    }
+                    $("select[name=parentName]").empty();
+                    $("select[name=parentName]").append(html);
+                    form.render('select');
+                }
+            });
+        });
+
+        form.on('select(pName)', function (data){
+            var pId = $("select[name=parentName]").val();
+            if (pId == '' && $("select[name=categoryType]").val() == 1) {
+                $("#parentId").prop('value', 0);
+            }else{
+                $("#parentId").prop('value', pId);
+            }
+        });
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "../category/edit/"+data.field.id+"/"+data.field.name+"/"+data.field.parentId+"/"+data.field.categoryType,
+                data: JSON.stringify(data.field),
+                dataType: "text",
+                ContentType: "application/json;charset=utf-8",
+                success: function (res){
+                    var index = layer.alert(res, {
+                        title: '最终的提交信息'
+                    }, function () {
+                        // 关闭弹出层
+                        layer.close(index);
+
+                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(iframeIndex);
+                    });
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

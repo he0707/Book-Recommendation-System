@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>修改用户</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layuimini/lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../layuimini/css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">ID</label>
+        <div class="layui-input-block">
+            <input type="text" disabled="disabled" name="id" lay-verify="required" lay-reqtext="ID不能为空" class="layui-input" th:value="${user.id}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户名</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" lay-reqtext="用户名不能为空" class="layui-input" th:value="${user.name}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="password" lay-verify="required" lay-reqtext="密码不能为空" placeholder="请输入密码" class="layui-input" th:value="${user.password}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="gender" value="1" title="男" th:field="*{user.gender}" checked>
+            <input type="radio" name="gender" value="0" title="女" th:field="*{user.gender}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">生日</label>
+        <div class="layui-input-block">
+            <input id="birthday" type="text" name="birthday" lay-verify="required" lay-reqtext="生日不能为空" placeholder="请输入生日yyyy-MM-dd" class="layui-input" th:value="${user.birthday}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="address" lay-verify="required" lay-reqtext="地址不能为空" placeholder="请输入地址" class="layui-input" th:value="${user.address}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">邮箱</label>
+        <div class="layui-input-block">
+            <input type="email" name="email" lay-verify="required" lay-reqtext="邮箱不能为空" placeholder="请输入邮箱" class="layui-input" th:value="${user.email}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">手机号</label>
+        <div class="layui-input-block">
+            <input type="number" name="mobile" lay-verify="required" lay-reqtext="手机号不能为空" placeholder="请输入手机号" class="layui-input" th:value="${user.mobile}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">头像</label>
+        <div class="layui-input-inline">
+            <img class="layui-upload-img" id="profileImg" name="profileImg" width="50px" height="50px">
+            <input id="profileName" type="text" name="profileName" lay-verify="required" lay-reqtext="头像不能为空" autocomplete="off"  class="layui-input" th:value="${user.profile}" disabled="disabled">
+        </div>
+        <div class="layui-form-inline">
+            <button type="button" class="layui-btn" id="test1">
+                <i class="layui-icon">&#xe67c;</i>上传图片
+            </button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="type" value="0" title="普通用户" th:field="*{user.type}" checked="">
+            <input type="radio" name="type" value="1" title="管理员" th:field="*{user.type}">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script src="../../layuimini/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use('laydate', function (){
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#birthday' //指定元素
+        });
+    });
+
+    //头像图片上传
+    layui.use('upload', function (){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,accept: 'images'
+            ,acceptMime: 'image/*'
+            ,url: '../uploadUserProfile' //改成您自己的上传接口
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#profileImg').attr('src', result); //图片链接（base64）
+                });
+            },done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    layer.msg('上传失败');
+                }
+                //上传成功
+                layer.msg('上传成功');
+                //将图片的名字放在表单中，添加的时候得放在数据库里面
+                $(function(){
+                    $("#profileName").attr('text', res.msg);
+                    $("#profileName").attr('value', res.msg);
+                    $("#profileName").val(res.msg);
+                })
+            }
+        });
+    });
+
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "../user/edit/"+data.field.id+"/"+data.field.name+"/"+data.field.password+"/"+data.field.gender+"/"+data.field.birthday+"/"+data.field.address+"/"+data.field.email+"/"+data.field.mobile+"/"+data.field.profileName+"/"+data.field.type,
+                data: JSON.stringify(data.field),
+                dataType: "text",
+                ContentType: "application/json;charset=utf-8",
+                success: function (res){
+                    var index = layer.alert(res, {
+                        title: '最终的提交信息'
+                    }, function () {
+                        // 关闭弹出层
+                        layer.close(index);
+
+                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(iframeIndex);
+                    });
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

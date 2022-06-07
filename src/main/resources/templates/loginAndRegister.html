@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>登录注册</title>
+    <link rel="stylesheet" href="/css/loginAndRegister.css">
+</head>
+<body>
+<div class="container">
+    <div class="login-box slide-up">
+        <div class="center">
+            <h2 class="login-title">
+                <span>已有账号，去</span>登录
+            </h2>
+            <form action="/login" method="post">
+                <div class="input-box">
+                    <input type="text" name="loginName" placeholder="用户名" required>
+                    <span th:text="${loginNameError}" style="color: red;text-align: center"></span>
+                    <input type="password" name="loginPwd" placeholder="密码" required>
+                    <span th:text="${loginPwdError}" style="color: red;text-align: center"></span>
+                    <div class="radio-box">
+                        <input type="radio" name="loginType" value="0" checked=true><span>普通用户</span>
+                        <input type="radio" name="loginType" value="1"><span>管理员</span>
+                    </div>
+                    <span th:text="${loginTypeError}" style="color: red;text-align: center"></span>
+                </div>
+                <button>登录</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="register-box">
+        <h2 class="register-title">
+            <span>没有账号，去</span>注册
+        </h2>
+        <form action="/register" onsubmit="return validateForm();" method="post">
+            <div class="input-box">
+                <input type="text" name="registerName" placeholder="用户名" required>
+                <span th:text="${registerNameError}" style="color: red;text-align: center"></span>
+                <input type="password" id="registerPwd" name="registerPwd" placeholder="密码" required>
+                <span th:text="${registerPwdError}" style="color: red;text-align: center"></span>
+                <input type="password" id="registerVerifyPwd" name="registerVerifyPwd" placeholder="确认密码" required>
+                <span th:text="${registerVerifyPwdError}" style="color: red;text-align: center"></span>
+            </div>
+            <button type="submit">注册</button>
+        </form>
+    </div>
+</div>
+<script src="js/loginAndRegister.js"></script>
+<script>
+    function validateForm() {
+        var registerPwd = document.getElementById("registerPwd").value;
+        var registerVerifyPwd= document.getElementById("registerVerifyPwd").value;
+        if(registerPwd != registerVerifyPwd){
+            window.alert("两次输入的密码不一致！");
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

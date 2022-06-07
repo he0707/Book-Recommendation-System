@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.grape.bookrs.mapper.UserMapper">
+    <select id="findListByMap" parameterType="java.util.Map" resultType="com.grape.bookrs.entity.User">
+        select * from User where 1 = 1
+        <if test="id != ''">
+            and id like '%${id}%'
+        </if>
+        <if test="name != ''">
+            and name like '%${name}%'
+        </if>
+        <if test="gender != ''">
+            and gender like '%${gender}%'
+        </if>
+        <if test="address != ''">
+            and address like '%${address}%'
+        </if>
+        <if test="page != '' and limit != ''">
+            limit ${(page-1) * limit}, #{limit}
+        </if>
+    </select>
+    <select id="findListCount" resultType="java.lang.Integer">
+        select count(*) from User where 1 = 1
+        <if test="id != ''">
+            and id like '%${id}%'
+        </if>
+        <if test="name != ''">
+            and name like '%${name}%'
+        </if>
+        <if test="gender != ''">
+            and gender like '%${gender}%'
+        </if>
+        <if test="address != ''">
+            and address like '%${address}%'
+        </if>
+    </select>
+</mapper>

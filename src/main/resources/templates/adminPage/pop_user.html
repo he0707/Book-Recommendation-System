@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>活跃读者</title>
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container-fluid">
+    <table class="table table-striped table-hover">
+        <tr>
+            <th>ID</th>
+            <th>用户名</th>
+            <th>性别</th>
+            <th>头像</th>
+            <th>评分总数</th>
+        </tr>
+        <tr th:each="popUser : ${popUsers}">
+            <td th:text="${popUser.getId()}"></td>
+            <td th:text="${popUser.getName()}"></td>
+            <td th:if="${popUser.getGender()} eq '0'" th:text="女"></td>
+            <td th:if="${popUser.getGender()} eq '1'" th:text="男"></td>
+            <td><img th:src="'/img/userProfile/'+${popUser.getProfile()}" th:alt="${popUser.getProfile()}" style="height: 40px;width: 40px"></td>
+            <td th:text="${popUser.getRatingNum()}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

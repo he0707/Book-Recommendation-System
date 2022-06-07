@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>推荐书单</title>
+    <style>
+        .thumbnail a:link,
+        .thumbnail a:visited{
+            color: #000;
+            text-decoration: none;
+        }
+    </style>
+    <th:block th:include="common.html :: source"></th:block>
+</head>
+<body>
+<th:block th:include="common.html :: header"></th:block>
+<p th:if="${isRating} eq '0'">尚未给图书评分过</p>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-md-3" th:each="Book: ${recommendationBooks}">
+            <div class="thumbnail" style="width: 100%;height: 415px">
+                <a th:href="'/book/bookDetail/'+${Book.getIsbn()}">
+                    <img th:src="'/img/bookImage/'+${Book.getImage()}" th:alt="${Book.getImage()}" style="width: 200px;height: 260px">
+                    <div class="caption">
+                        <h3 th:text="${Book.getTitle()}"></h3>
+                        <p th:text="'作者：'+${Book.getAuthor()}"></p>
+                    </div>
+                </a>
+                <p style="position: absolute;bottom: 15px">
+                    <button class="btn btn-primary" type="button" th:value="${Book.getIsbn()}" onclick="addCollect($(this).attr('value'))">
+                        <span class="glyphicon glyphicon-star"></span>收藏
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="common.html :: permit"></th:block>
+
+<script>
+    function addCollect(isbn){
+        $.ajax({
+            url: '/collect/add/'+isbn,
+            success(result){
+                alert(result);
+            }
+        });
+    };
+</script>
+</body>
+</html>

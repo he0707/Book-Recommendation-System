@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.grape.bookrs.mapper.BookMapper">
+
+    <select id="findListByMap" parameterType="java.util.Map" resultType="com.grape.bookrs.entity.Book">
+        select * from Book where 1 = 1
+        <if test="isbn != ''">
+            and isbn like '%${isbn}%'
+        </if>
+        <if test="title != ''">
+            and title like '%${title}%'
+        </if>
+        <if test="author != ''">
+            and author like '%${author}%'
+        </if>
+        <if test="publisher != ''">
+            and publisher like '%${publisher}%'
+        </if>
+        <if test="categorylevelone != ''">
+            and categorylevelone like '%${categorylevelone}%'
+        </if>
+        <if test="categoryleveltwo != ''">
+            and categoryleveltwo like '%${categoryleveltwo}%'
+        </if>
+        <if test="page != '' and limit != ''">
+            limit ${(page-1) * limit}, #{limit}
+        </if>
+    </select>
+    <select id="findListCount" resultType="java.lang.Integer">
+        select count(*) from Book where 1 = 1
+        <if test="isbn != ''">
+            and isbn like '%${isbn}%'
+        </if>
+        <if test="title != ''">
+            and title like '%${title}%'
+        </if>
+        <if test="author != ''">
+            and author like '%${author}%'
+        </if>
+        <if test="publisher != ''">
+            and publisher like '%${publisher}%'
+        </if>
+        <if test="categorylevelone != ''">
+            and categorylevelone like '%${categorylevelone}%'
+        </if>
+        <if test="categoryleveltwo != ''">
+            and categoryleveltwo like '%${categoryleveltwo}%'
+        </if>
+    </select>
+    <select id="getNewBooks" resultType="com.grape.bookrs.entity.Book">
+        select * from Book
+        order by year_of_publication desc
+        limit 0, 8
+    </select>
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.grape.bookrs.mapper.CategoryMapper">
+
+
+    <select id="findListByMap" parameterType="java.util.Map" resultType="com.grape.bookrs.entity.Category">
+        select * from Category where 1 = 1
+        <if test="id != ''">
+            and id like '%${id}%'
+        </if>
+        <if test="name != ''">
+            and name like '%${name}%'
+        </if>
+        <if test="parentId != ''">
+            and parent_id like '%${parentId}%'
+        </if>
+        <if test="type != ''">
+            and type like '%${type}%'
+        </if>
+        <if test="page != '' and limit != ''">
+            limit ${(page-1) * limit}, #{limit}
+        </if>
+    </select>
+    <select id="findListCount" resultType="java.lang.Integer">
+        select count(*) from Category where 1 = 1
+        <if test="id != ''">
+            and id like '%${id}%'
+        </if>
+        <if test="name != ''">
+            and name like '%${name}%'
+        </if>
+        <if test="parentId != ''">
+            and parent_id like '%${parentId}%'
+        </if>
+        <if test="type != ''">
+            and type like '%${type}%'
+        </if>
+    </select>
+
+</mapper>

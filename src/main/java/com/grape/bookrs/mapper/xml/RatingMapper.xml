@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.grape.bookrs.mapper.RatingMapper">
+
+    <select id="findListByMap" parameterType="java.util.Map" resultType="com.grape.bookrs.entity.Rating">
+        select * from Rating where 1 = 1
+        <if test="id != ''">
+            and id like '%${id}%'
+        </if>
+        <if test="userId != ''">
+            and user_id like '%${userId}%'
+        </if>
+        <if test="isbn != ''">
+            and isbn like '%${isbn}%'
+        </if>
+        <if test="rating != ''">
+            and rating like '%${rating}%'
+        </if>
+        <if test="page != '' and limit != ''">
+            limit ${(page-1) * limit}, #{limit}
+        </if>
+    </select>
+    <select id="findListCount" resultType="java.lang.Integer">
+        select count(*) from Rating where 1 = 1
+        <if test="id != ''">
+            and id like '%${id}%'
+        </if>
+        <if test="userId != ''">
+            and user_id like '%${userId}%'
+        </if>
+        <if test="isbn != ''">
+            and isbn like '%${isbn}%'
+        </if>
+        <if test="rating != ''">
+            and rating like '%${rating}%'
+        </if>
+    </select>
+</mapper>

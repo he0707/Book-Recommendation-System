@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>图书详情</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+<!--    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">-->
+<!--    <script src="js/jquery-3.6.0.min.js"></script>-->
+<!--    <script src="bootstrap/js/bootstrap.min.js"></script>-->
+    <th:block th:include="common.html :: source"></th:block>
+</head>
+<body>
+<th:block th:include="common.html :: header"></th:block>
+<div class="bg-primary" style="height: 80px; line-height: 80px; margin-bottom: 30px">
+    <span style="font-size: x-large; margin-left: 80px">图书详情</span>
+</div>
+<p id="userId" th:if="${session.user != null}" th:text="${session.user.getId()}" th:value="${session.user.getId()}" hidden></p>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <img class="img-thumbnail" th:src="'/img/bookImage/'+${book.getImage()}" th:alt="${book.getImage()}" style="width: 200px;height: 260px">
+            <p th:unless="${isRating}">
+                未评分过，
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+                    我要评分
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">图书评分</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p id="mystar"></p><br>
+                                <textarea id="myremark" placeholder="评论一下" rows="10" cols="60"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-primary" onclick="addrating()">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p>
+            <p th:if="${isRating}">
+                已评分过，
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal1">
+                    修改评分
+                </button>
+                <!-- Modal -->
+            <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel1">图书评分</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p id="myratingid1" hidden></p>
+                            <p id="mystar1"></p><br>
+                            <textarea id="myremark1" placeholder="评论一下" rows="10" cols="60"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" onclick="editrating()">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </p>
+        </div>
+        <div class="col-md-9">
+            <span style="color: #c7bb00"><b>图书名称：</b></span>
+            <p th:text="${book.getTitle()}"></p>
+            <span style="color: #c7bb00"><b>图书作者：</b></span>
+            <p th:text="${book.getAuthor()}"></p>
+            <span style="color: #c7bb00"><b>ISBN：</b></span>
+            <p th:text="${book.getIsbn()}"></p>
+            <span style="color: #c7bb00"><b>出版社：</b></span>
+            <p th:text="${book.getPublisher()}"></p>
+            <span style="color: #c7bb00"><b>出版年份：</b></span>
+            <p th:text="${book.getYearOfPublication()}+'年'"></p>
+            <span style="color: #c7bb00"><b>图书简介：</b></span>
+            <p th:text="'&nbsp;&nbsp;&nbsp;&nbsp;'+${book.getDescription()}"></p>
+            <hr>
+            <span style="color: #c7bb00"><b>读者评分：</b></span>
+            <p><b th:text="${ratingVoList.size()}+'个读者评分'"></b></p>
+            <div th:each="ratingVo : ${ratingVoList}">
+                <p>
+                    <img class="img-circle" th:src="'/img/userProfile/'+${ratingVo.getUserProfile()}" th:alt="${ratingVo.getUserProfile()}" style="width: 40px;height: 40px;">
+                    <span th:text="${ratingVo.getUserName()}"></span>
+                </p>
+                <p th:id="'star'+${ratingVo.getId()}"></p>
+                <p th:text="'&nbsp;&nbsp;&nbsp;&nbsp;'+${ratingVo.getRemark()}"></p>
+                <p><small th:text="${ratingVo.getUpdateTime()}"></small></p>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="common.html :: permit"></th:block>
+
+<script src="/layui/layui.js"></script>
+<script th:inline="javascript">
+
+        if ([[${isRating}]] == 1) {
+            var userId = document.getElementById("userId").innerText;
+        } else {
+            var userId = '';
+        }
+        layui.use('rate', function(){
+            var rate = layui.rate;
+            var list = [[${ratingVoList}]];
+
+            for (let i=0; i<list.length; i++) {
+                //渲染
+                var ins1 = rate.render({
+                    elem: "#star"+list[i].id,  //绑定元素
+                    length: 5,
+                    value: list[i].rating/2,
+                    half: true,
+                    readonly: true
+                });
+                if (userId == list[i].userId) {
+                    var mystar1 = rate.render({
+                        elem: "#mystar1",
+                        length: 5,
+                        value: list[i].rating/2,
+                        half: true,
+                        choose: function(value){
+                            $("#mystar1").val(value*2);
+                        }
+                    });
+                    $("#myratingid1").val(list[i].id);
+                    $("#myremark1").val(list[i].remark);
+                }
+            }
+            var mystar = rate.render({
+                elem: "#mystar",  //绑定元素
+                length: 5,
+                half: true,
+                choose: function(value){
+                    $("#mystar").val(value*2);
+                }
+            });
+        });
+
+        function addrating(){
+            var user = [[${session.user}]];
+            if (user == null) {
+                alert("未登录");
+            }
+            var isbn = [[${book}]].isbn;
+            var rating = $("#mystar").val();
+            var remark = $("#myremark").val();
+            if (rating == '' || remark == '') {
+                alert("请评分");
+            } else {
+                window.location.href='/rating/add/'+isbn+'/'+rating+'/'+remark;
+            }
+        }
+        function editrating(){
+            var id = $("#myratingid1").val();
+            var isbn = [[${book}]].isbn;
+            var rating = $("#mystar1").val();
+            var remark = $("#myremark1").val();
+            if (rating == '' || remark == '') {
+                alert("请评分");
+            } else {
+                window.location.href='/rating/edit/'+id+'/'+isbn+'/'+rating+'/'+remark;
+            }
+        }
+</script>
+</body>
+</html>
